@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Costruttori di Pace - Kahoot Style</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; }
+        .quiz-container { width: 60%; margin: auto; padding: 20px; background: white; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; }
+        .question { margin: 20px 0; }
+        .answer { margin: 10px 0; }
+        button { cursor: pointer; padding: 10px 20px; border: none; border-radius: 5px; background: #007bff; color: white; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Quiz Costruttori di Pace</h1>
+        <div class="question">
+            <p>1. Cos'è la pace?</p>
+            <div class="answer">
+                <button onclick="checkAnswer('A')">A) Assenza di conflitto</button>
+                <button onclick="checkAnswer('B')">B) Uno stato di guerra</button>
+                <button onclick="checkAnswer('C')">C) Indifferenza verso gli altri</button>
+                <button onclick="checkAnswer('D')">D) Ricerca di potere</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function checkAnswer(answer) {
+            if (answer === 'A') {
+                alert('Corretto! La pace è l'assenza di conflitto.');
+            } else {
+                alert('Sbagliato! Riprova!');
+            }
+        }
+    </script>
+</body>
+</html>
