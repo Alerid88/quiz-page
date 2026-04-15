@@ -1,40 +1,370 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Costruttori di Pace - Kahoot Style</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; }
-        .quiz-container { width: 60%; margin: auto; padding: 20px; background: white; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h1 { text-align: center; }
-        .question { margin: 20px 0; }
-        .answer { margin: 10px 0; }
-        button { cursor: pointer; padding: 10px 20px; border: none; border-radius: 5px; background: #007bff; color: white; }
-        button:hover { background: #0056b3; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz Costruttori di Pace</title>
+  <style>
+    :root {
+      --blue:#3b82f6;
+      --yellow:#facc15;
+      --red:#ef4444;
+      --green:#22c55e;
+      --purple:#8b5cf6;
+      --bg:#f7fbff;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(135deg,#dbeafe 0%,#fef9c3 50%,#fce7f3 100%);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .app{
+      width:min(1100px,100%);
+      display:grid;
+      grid-template-columns:2fr 1fr;
+      gap:20px;
+    }
+    .panel,.side{
+      background:rgba(255,255,255,.92);
+      border-radius:24px;
+      box-shadow:0 18px 40px rgba(0,0,0,.12);
+      padding:24px;
+    }
+    .title{
+      display:flex;align-items:center;gap:14px;margin-bottom:10px;
+    }
+    .badge{
+      width:58px;height:58px;border-radius:18px;background:linear-gradient(135deg,var(--purple),var(--blue));
+      display:flex;align-items:center;justify-content:center;font-size:28px;color:white;
+    }
+    h1{margin:0;font-size:30px}
+    .subtitle{margin:6px 0 18px;color:var(--muted)}
+    .topbar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .pill{padding:10px 14px;border-radius:999px;font-weight:700;background:#eef2ff}
+    .timer{background:#fee2e2;color:#991b1b}
+    .score{background:#dcfce7;color:#166534}
+    .question-box{background:var(--card);border:3px dashed #bfdbfe;border-radius:22px;padding:20px;min-height:200px}
+    .question-num{font-size:14px;font-weight:700;color:#2563eb;text-transform:uppercase;letter-spacing:.06em}
+    .question{font-size:28px;line-height:1.3;margin:10px 0 18px}
+    .answers{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .answer{
+      border:none;border-radius:18px;padding:18px;font-size:18px;font-weight:700;cursor:pointer;color:#111827;
+      min-height:82px;transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+    }
+    .answer:hover{transform:translateY(-2px);box-shadow:0 10px 16px rgba(0,0,0,.08)}
+    .answer:disabled{cursor:not-allowed;opacity:.85}
+    .a1{background:#fde68a}.a2{background:#bfdbfe}.a3{background:#fecaca}.a4{background:#c7f9cc}
+    .feedback{margin-top:18px;padding:14px 16px;border-radius:16px;font-size:18px;font-weight:700;display:none}
+    .ok{background:#dcfce7;color:#166534}.ko{background:#fee2e2;color:#991b1b}
+    .progress-wrap{margin-top:20px}
+    .progress-label{font-size:14px;color:var(--muted);margin-bottom:8px}
+    .progress{height:16px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+    .bar{height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--blue),var(--green));transition:width .3s ease}
+    .rank-card{background:linear-gradient(135deg,#eff6ff,#f5f3ff);border-radius:20px;padding:18px;margin-bottom:16px}
+    .rank-title{font-size:20px;font-weight:800;margin-bottom:10px}
+    .player{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.08)}
+    .player:last-child{border-bottom:none}
+    .me{font-weight:800;color:#7c3aed}
+    .tips{background:#fefce8;border-radius:18px;padding:16px;font-size:15px;line-height:1.5}
+    .final{display:none;text-align:center;padding:20px 10px}
+    .final h2{font-size:34px;margin-bottom:10px}
+    .big-score{font-size:58px;font-weight:900;color:#7c3aed;margin:12px 0}
+    .restart{margin-top:16px;background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;border:none;border-radius:16px;padding:14px 22px;font-size:18px;font-weight:800;cursor:pointer}
+    @media (max-width: 860px){
+      .app{grid-template-columns:1fr}
+      .answers{grid-template-columns:1fr}
+      .question{font-size:24px}
+    }
+  </style>
 </head>
 <body>
-    <div class="quiz-container">
-        <h1>Quiz Costruttori di Pace</h1>
-        <div class="question">
-            <p>1. Cos'è la pace?</p>
-            <div class="answer">
-                <button onclick="checkAnswer('A')">A) Assenza di conflitto</button>
-                <button onclick="checkAnswer('B')">B) Uno stato di guerra</button>
-                <button onclick="checkAnswer('C')">C) Indifferenza verso gli altri</button>
-                <button onclick="checkAnswer('D')">D) Ricerca di potere</button>
-            </div>
+  <div class="app">
+    <section class="panel">
+      <div class="title">
+        <div class="badge">🕊️</div>
+        <div>
+          <h1>Quiz Costruttori di Pace</h1>
+          <div class="subtitle">realizzato da Alessia Ridolfi</div>
         </div>
-    </div>
-    <script>
-        function checkAnswer(answer) {
-            if (answer === 'A') {
-                alert('Corretto! La pace è l'assenza di conflitto.');
-            } else {
-                alert('Sbagliato! Riprova!');
-            }
-        }
-    </script>
+      </div>
+
+      <div id="quizArea">
+        <div class="topbar">
+          <div class="pill" id="questionCounter">Domanda 1 di 8</div>
+          <div class="pill score" id="scoreBox">Punti: 0</div>
+          <div class="pill timer" id="timerBox">Tempo: 20</div>
+        </div>
+
+        <div class="question-box">
+          <div class="question-num">Educazione civica e pace</div>
+          <div class="question" id="questionText"></div>
+          <div class="answers" id="answersBox"></div>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <div class="progress-wrap">
+          <div class="progress-label">Avanzamento del quiz</div>
+          <div class="progress"><div class="bar" id="progressBar"></div></div>
+        </div>
+      </div>
+
+      <div class="final" id="finalScreen">
+        <h2>Hai completato il quiz!</h2>
+        <p>Bravissimo! Hai concluso il percorso sui costruttori di pace.</p>
+        <div class="big-score" id="finalScore"></div>
+        <p id="finalMessage"></p>
+        <button class="restart" onclick="restartQuiz()">Ricomincia</button>
+      </div>
+    </section>
+
+    <aside class="side">
+      <div class="rank-card">
+        <div class="rank-title">🏆 Classifica classe</div>
+        <div class="player"><span>1. Sara</span><strong>760</strong></div>
+        <div class="player"><span>2. Luca</span><strong>720</strong></div>
+        <div class="player me"><span>3. Tu</span><strong id="liveRankScore">0</strong></div>
+        <div class="player"><span>4. Adam</span><strong>640</strong></div>
+        <div class="player"><span>5. Giulia</span><strong>610</strong></div>
+      </div>
+
+      <div class="tips">
+        <strong>Come si gioca</strong><br>
+        - Leggi bene la domanda.<br>
+        - Scegli una risposta tra le 4 proposte.<br>
+        - Se rispondi prima, guadagni più punti.<br>
+        - L'obiettivo non è solo vincere, ma capire meglio il valore della pace.
+      </div>
+    </aside>
+  </div>
+
+<script>
+const questions = [
+  {
+    question: "Che cosa significa essere costruttori di pace?",
+    answers: [
+      "Litigare per difendere sempre le proprie idee",
+      "Impegnarsi a risolvere i conflitti senza violenza",
+      "Restare in silenzio davanti alle ingiustizie",
+      "Evitare sempre di parlare con gli altri"
+    ],
+    correct: 1
+  },
+  {
+    question: "Quale comportamento aiuta a mantenere la pace in classe?",
+    answers: [
+      "Prendere in giro chi sbaglia",
+      "Ascoltare gli altri con rispetto",
+      "Volere sempre avere ragione",
+      "Escludere chi è diverso"
+    ],
+    correct: 1
+  },
+  {
+    question: "Quando nasce un conflitto, la scelta migliore è:",
+    answers: [
+      "Usare subito la forza",
+      "Parlare e cercare una soluzione insieme",
+      "Vendicarsi",
+      "Urlare più forte degli altri"
+    ],
+    correct: 1
+  },
+  {
+    question: "La non violenza vuol dire:",
+    answers: [
+      "Essere deboli",
+      "Non fare mai nulla",
+      "Affrontare i problemi senza fare male agli altri",
+      "Lasciare sempre decidere agli altri"
+    ],
+    correct: 2
+  },
+  {
+    question: "Quale di queste parole è più vicina all'idea di pace?",
+    answers: [
+      "Cooperazione",
+      "Prepotenza",
+      "Paura",
+      "Esclusione"
+    ],
+    correct: 0
+  },
+  {
+    question: "Aiutare un compagno in difficoltà è un gesto di:",
+    answers: [
+      "Indifferenza",
+      "Competizione",
+      "Solidarietà",
+      "Punizione"
+    ],
+    correct: 2
+  },
+  {
+    question: "Per costruire un clima positivo nella classe è importante:",
+    answers: [
+      "Collaborare e rispettare le regole comuni",
+      "Pensare solo a se stessi",
+      "Escludere chi fa più fatica",
+      "Trasformare tutto in una gara"
+    ],
+    correct: 0
+  },
+  {
+    question: "Un vero costruttore di pace sceglie di:",
+    answers: [
+      "Alimentare la rabbia",
+      "Cercare il dialogo, il rispetto e l'aiuto reciproco",
+      "Comandare sugli altri",
+      "Ignorare chi soffre"
+    ],
+    correct: 1
+  }
+];
+
+let currentQuestion = 0;
+let score = 0;
+let timeLeft = 20;
+let timer;
+let locked = false;
+
+const questionText = document.getElementById('questionText');
+const answersBox = document.getElementById('answersBox');
+const feedback = document.getElementById('feedback');
+const scoreBox = document.getElementById('scoreBox');
+const timerBox = document.getElementById('timerBox');
+const questionCounter = document.getElementById('questionCounter');
+const progressBar = document.getElementById('progressBar');
+const finalScreen = document.getElementById('finalScreen');
+const quizArea = document.getElementById('quizArea');
+const finalScore = document.getElementById('finalScore');
+const finalMessage = document.getElementById('finalMessage');
+const liveRankScore = document.getElementById('liveRankScore');
+
+function loadQuestion() {
+  locked = false;
+  clearInterval(timer);
+  timeLeft = 20;
+  timerBox.textContent = `Tempo: ${timeLeft}`;
+  feedback.style.display = 'none';
+  feedback.className = 'feedback';
+
+  const q = questions[currentQuestion];
+  questionText.textContent = q.question;
+  questionCounter.textContent = `Domanda ${currentQuestion + 1} di ${questions.length}`;
+  progressBar.style.width = `${(currentQuestion / questions.length) * 100}%`;
+  answersBox.innerHTML = '';
+
+  q.answers.forEach((answer, index) => {
+    const button = document.createElement('button');
+    button.className = `answer a${(index % 4) + 1}`;
+    button.textContent = answer;
+    button.onclick = () => selectAnswer(index);
+    answersBox.appendChild(button);
+  });
+
+  timer = setInterval(() => {
+    timeLeft--;
+    timerBox.textContent = `Tempo: ${timeLeft}`;
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      if (!locked) timeOutAnswer();
+    }
+  }, 1000);
+}
+
+function selectAnswer(index) {
+  if (locked) return;
+  locked = true;
+  clearInterval(timer);
+  const q = questions[currentQuestion];
+  const buttons = document.querySelectorAll('.answer');
+  buttons.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.correct) btn.style.outline = '4px solid #16a34a';
+    if (i === index && i !== q.correct) btn.style.outline = '4px solid #dc2626';
+  });
+
+  if (index === q.correct) {
+    const gained = 50 + timeLeft * 10;
+    score += gained;
+    feedback.textContent = `Risposta corretta! Hai guadagnato ${gained} punti.`;
+    feedback.classList.add('ok');
+  } else {
+    feedback.textContent = 'Risposta sbagliata, ma puoi riprovarci la prossima volta!';
+    feedback.classList.add('ko');
+  }
+
+  feedback.style.display = 'block';
+  updateScore();
+  setTimeout(nextQuestion, 1800);
+}
+
+function timeOutAnswer() {
+  locked = true;
+  const q = questions[currentQuestion];
+  const buttons = document.querySelectorAll('.answer');
+  buttons.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.correct) btn.style.outline = '4px solid #16a34a';
+  });
+  feedback.textContent = 'Tempo scaduto! Vediamo la prossima domanda.';
+  feedback.classList.add('ko');
+  feedback.style.display = 'block';
+  setTimeout(nextQuestion, 1800);
+}
+
+function nextQuestion() {
+  currentQuestion++;
+  if (currentQuestion < questions.length) {
+    loadQuestion();
+  } else {
+    showFinal();
+  }
+}
+
+function updateScore() {
+  scoreBox.textContent = `Punti: ${score}`;
+  liveRankScore.textContent = score;
+}
+
+function showFinal() {
+  clearInterval(timer);
+  progressBar.style.width = '100%';
+  quizArea.style.display = 'none';
+  finalScreen.style.display = 'block';
+  finalScore.textContent = score + ' punti';
+
+  if (score >= 900) {
+    finalMessage.textContent = 'Fantastico! Sei un vero costruttore di pace!';
+  } else if (score >= 600) {
+    finalMessage.textContent = 'Molto bene! Hai capito il valore del rispetto e della cooperazione.';
+  } else {
+    finalMessage.textContent = 'Bravo! Con un po’ di allenamento diventerai ancora più esperto.';
+  }
+}
+
+function restartQuiz() {
+  currentQuestion = 0;
+  score = 0;
+  updateScore();
+  quizArea.style.display = 'block';
+  finalScreen.style.display = 'none';
+  loadQuestion();
+}
+
+updateScore();
+loadQuestion();
+</script>
 </body>
 </html>
